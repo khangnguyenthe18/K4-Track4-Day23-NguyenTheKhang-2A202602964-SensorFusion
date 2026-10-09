@@ -181,4 +181,8 @@ def main() -> int:
 
 
 if __name__ == "__main__":
+    # Ensure Vietnamese output works on Windows consoles with cp1252 locale.
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8", errors="replace")
     sys.exit(main())
