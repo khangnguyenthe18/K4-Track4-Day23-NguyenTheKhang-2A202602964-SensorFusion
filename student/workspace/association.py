@@ -95,12 +95,15 @@ def pick_next_pair(
         If no finite pair exists, return np.nan for track and meas and retain both lists.
     """
     mat = np.asarray(association_matrix)
-    if mat.size == 0 or not np.isfinite(mat).any() or np.all(np.isinf(mat)):
+    if mat.size == 0 or not np.isfinite(mat).any():
         return np.nan, np.nan, association_matrix, list(unassigned_tracks), list(unassigned_meas)
-    min_val = np.min(mat)
-    if not np.isfinite(min_val):
+    
+    finite_mat = np.where(np.isfinite(mat), mat, np.inf)
+    min_val = np.min(finite_mat)
+    if not np.isfinite(min_val) or np.isinf(min_val):
         return np.nan, np.nan, association_matrix, list(unassigned_tracks), list(unassigned_meas)
-    row, col = np.unravel_index(np.argmin(mat), mat.shape)
+    
+    row, col = np.unravel_index(np.argmin(finite_mat), mat.shape)
     selected_track = unassigned_tracks[row]
     selected_meas = unassigned_meas[col]
     new_tracks = [t for i, t in enumerate(unassigned_tracks) if i != row]
@@ -137,7 +140,7 @@ def associate_and_update(
             track, meas, cost_mat, unassigned_tracks, unassigned_meas = pick_next_pair(
                 cost_mat, unassigned_tracks, unassigned_meas
             )
-            if track is np.nan or meas is np.nan:
+            if track is np.nan or (isinstance(track, float) and np.isnan(track)):
                 break
             filter_obj.update(track, meas)
             manager.handle_updated_track(track, sensor)
