@@ -8,8 +8,8 @@ from __future__ import annotations
 
 from typing import Any
 
-from fusion_lab.workspace_support import get_tracking_params
 import numpy as np
+from fusion_lab.workspace_support import get_tracking_params
 
 
 def init_track_state_from_meas(meas: Any) -> dict[str, Any]:

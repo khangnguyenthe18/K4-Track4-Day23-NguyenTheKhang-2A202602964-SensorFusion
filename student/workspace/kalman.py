@@ -7,16 +7,14 @@ Read the shared time step and process-noise settings with get_tracking_params().
 from __future__ import annotations
 
 from typing import Any
-from typing import Optional
 
 import numpy as np
-
 from fusion_lab.workspace_support import get_tracking_params
 
 Matrix = np.matrix | np.ndarray
 
 
-def build_F(dt: Optional[float] = None) -> Matrix:
+def build_F(dt: float | None = None) -> Matrix:
     """Build the constant-velocity state transition matrix F.
 
     Args:
@@ -26,16 +24,15 @@ def build_F(dt: Optional[float] = None) -> Matrix:
         6x6 state transition matrix as ``np.matrix``.
     """
     params = get_tracking_params()
-    if dt is None:
-        dt = params.dt
+    dt_val = float(params.dt if dt is None else dt)
     F = np.asmatrix(np.eye(6, dtype=float))
-    F[0, 3] = float(dt)
-    F[1, 4] = float(dt)
-    F[2, 5] = float(dt)
+    F[0, 3] = dt_val
+    F[1, 4] = dt_val
+    F[2, 5] = dt_val
     return F
 
 
-def build_Q(dt: Optional[float] = None, q: Optional[float] = None) -> Matrix:
+def build_Q(dt: float | None = None, q: float | None = None) -> Matrix:
     """Build the process noise covariance matrix Q.
 
     Args:
@@ -46,18 +43,16 @@ def build_Q(dt: Optional[float] = None, q: Optional[float] = None) -> Matrix:
         6x6 process noise matrix.
     """
     params = get_tracking_params()
-    if dt is None:
-        dt = params.dt
-    if q is None:
-        q = params.q
-    return np.asmatrix(np.diag([float(dt * q)] * 6))
+    dt_val = float(params.dt if dt is None else dt)
+    q_val = float(params.q if q is None else q)
+    return np.asmatrix(np.diag([dt_val * q_val] * 6))
 
 
 def ekf_predict(
     x: Matrix,
     P: Matrix,
-    F: Optional[Matrix] = None,
-    Q: Optional[Matrix] = None,
+    F: Matrix | None = None,
+    Q: Matrix | None = None,
 ) -> tuple[Matrix, Matrix]:
     """Predict state and covariance one time step forward.
 

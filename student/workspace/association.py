@@ -7,15 +7,13 @@ for the chi-square gate.
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from typing import Any
-from typing import Sequence
 
 import numpy as np
-
-from scipy.stats import chi2
-
 from fusion_lab.workspace_loader import load_workspace_module
 from fusion_lab.workspace_support import get_tracking_params
+from scipy.stats import chi2
 
 
 def mahalanobis_distance(track: Any, meas: Any) -> float:
@@ -97,18 +95,19 @@ def pick_next_pair(
     mat = np.asarray(association_matrix)
     if mat.size == 0 or not np.isfinite(mat).any():
         return np.nan, np.nan, association_matrix, list(unassigned_tracks), list(unassigned_meas)
-    
+
     finite_mat = np.where(np.isfinite(mat), mat, np.inf)
     min_val = np.min(finite_mat)
     if not np.isfinite(min_val) or np.isinf(min_val):
         return np.nan, np.nan, association_matrix, list(unassigned_tracks), list(unassigned_meas)
-    
+
     row, col = np.unravel_index(np.argmin(finite_mat), mat.shape)
-    selected_track = unassigned_tracks[row]
-    selected_meas = unassigned_meas[col]
-    new_tracks = [t for i, t in enumerate(unassigned_tracks) if i != row]
-    new_meas = [m for j, m in enumerate(unassigned_meas) if j != col]
-    new_mat = np.delete(np.delete(mat, row, axis=0), col, axis=1)
+    r_idx, c_idx = int(row), int(col)
+    selected_track = unassigned_tracks[r_idx]
+    selected_meas = unassigned_meas[c_idx]
+    new_tracks = [t for i, t in enumerate(unassigned_tracks) if i != r_idx]
+    new_meas = [m for j, m in enumerate(unassigned_meas) if j != c_idx]
+    new_mat = np.delete(np.delete(mat, r_idx, axis=0), c_idx, axis=1)
     return selected_track, selected_meas, np.asmatrix(new_mat), new_tracks, new_meas
 
 
@@ -140,7 +139,7 @@ def associate_and_update(
             track, meas, cost_mat, unassigned_tracks, unassigned_meas = pick_next_pair(
                 cost_mat, unassigned_tracks, unassigned_meas
             )
-            if track is np.nan or (isinstance(track, float) and np.isnan(track)):
+            if isinstance(track, float) and np.isnan(track):
                 break
             filter_obj.update(track, meas)
             manager.handle_updated_track(track, sensor)

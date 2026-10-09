@@ -6,11 +6,10 @@ The platform differentiates projection using a chain-rule Jacobian.
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from typing import Any
-from typing import Sequence
 
 import numpy as np
-
 from fusion_lab.workspace_support import get_tracking_params
 
 Matrix = np.matrix | np.ndarray
