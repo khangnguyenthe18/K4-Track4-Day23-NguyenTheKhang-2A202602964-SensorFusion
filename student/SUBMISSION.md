@@ -8,7 +8,7 @@
 - MSSV: 2A202602964
 - Email: thekhang2004@gmail.com
 - Link repo (fork): https://github.com/khangnguyenthe18/K4-Track4-Day23-NguyenTheKhang-2A202602964-SensorFusion
-- Commit hash nộp (`git rev-parse HEAD`): 2b257b9e735e83e60228d447470fcf147e8c140c
+- Commit hash nộp (`git rev-parse HEAD`): a2feea847f5bfb936291e68cd54398d6044b860a
 
 ## Tóm tắt kết quả
 
